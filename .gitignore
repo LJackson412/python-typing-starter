@@ -1,0 +1,27 @@
+.env
+.venv
+__pycache__
+
+.pytest_cache
+.mypy_cache
+.langgraph_api
+.ruff_cache
+
+# Build files
+dist/
+build/
+*.egg-info/
+.eggs/
+*.whl
+*.tar.gz
+
+# IDE files
+.vscode/
+.idea/
+
+# Prod Data
+/data
+
+
+# Framework-Specific
+.chroma
