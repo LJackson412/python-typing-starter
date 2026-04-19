@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Type
 
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -19,15 +18,24 @@ class Rating(str, Enum):
 class LLMPotenzialRatingLogic(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    high: str = Field(..., description="Bedingung für hohes Potenzial")
-    medium: str = Field(..., description="Bedingung für mittleres Potenzial")
-    low: str = Field(..., description="Bedingung für geringes Potenzial")
+    high: str = Field(
+        ...,
+        description="Bedingung für hohes Potenzial",
+    )
+    medium: str = Field(
+        ...,
+        description="Bedingung für mittleres Potenzial",
+    )
+    low: str = Field(
+        ...,
+        description="Bedingung für geringes Potenzial",
+    )
 
 
-class LLMSheetMetalSubPotentialResult(BaseModel):
+class LLMSheetMetalSubPotential(BaseModel):
     """
-    Das ist ausschließlich das erwartete LLM-Ergebnis.
-    Diese Felder sollen vom LLM befüllt werden.
+    Pydantic-Modell für alle Felder, die vom LLM verwendet,
+    bewertet oder als Ergebnis geliefert werden.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -42,7 +50,7 @@ class LLMSheetMetalSubPotentialResult(BaseModel):
     )
     evidence: list[str] = Field(
         ...,
-        description="Beobachtbare Hinweise aus Bild, CAD oder Abwicklung",
+        description="Beobachtbare Hinweise aus dem Bild der Blechkonstruktion",
     )
     confidence: float = Field(
         ...,
@@ -52,13 +60,12 @@ class LLMSheetMetalSubPotentialResult(BaseModel):
     )
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass
 class SheetMetalSubPotential:
     """
-    Statische Definition eines Blech-Subpotentials.
-
-    Diese Daten sind vor der LLM-Auswertung bekannt und werden
-    als Kontext / Instruktion in den Prompt gegeben.
+    Dataclass für ein generisches Blech-Sub-Potenzial.
+    Enthält die nicht vom LLM zu befüllenden Metadaten sowie
+    das Pydantic-Modell mit den LLM-relevanten Feldern.
     """
 
     subpotential_id: str = field(
@@ -79,27 +86,24 @@ class SheetMetalSubPotential:
         }
     )
 
-    llm_evaluation_goal: str = field(
+    # following are used in the system prompt
+    llm_model: LLMSheetMetalSubPotential = field(
         metadata={
-            "description": "Beschreibt dem LLM das Ziel der Bewertung",
+            "description": "Pydantic-Modell mit LLM-Bewertungs- und LLM-Ergebnisfeldern",
         }
     )
-
-    llm_check_method: str = field(
+    llm_evaluation_goal: str = Field(
+        metadata={
+            "description": "Beschreibt das Ziel der Bewertung",
+        }
+    )
+    llm_check_method: str = Field(
         metadata={
             "description": "Gibt dem LLM vor, wie das Subpotential zu bewerten ist",
         }
     )
-
-    llm_potenzial_rating_logic: LLMPotenzialRatingLogic = field(
+    llm_potenzial_rating_logic: LLMPotenzialRatingLogic = Field(
         metadata={
             "description": "Rating-Logik zur Bewertung des Subpotentials",
         }
-    )
-
-    llm_result_model: Type[BaseModel] = field(
-        default=LLMSheetMetalSubPotentialResult,
-        metadata={
-            "description": "Pydantic-Modell für das erwartete LLM-Ergebnis",
-        },
     )
