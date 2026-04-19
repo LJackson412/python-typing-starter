@@ -1,7 +1,7 @@
 from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain_openai import ChatOpenAI
 
-from audit_proto.config.settings import settings
+from smi.config.settings import settings
 
 
 def get_openai_chat_model(

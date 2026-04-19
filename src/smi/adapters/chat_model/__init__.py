@@ -1,1 +1,1 @@
-"""Outbound chunk-extraction adapters and helper utilities."""
+"""Outbound chat-model adapters and factory."""
