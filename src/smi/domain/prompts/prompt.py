@@ -1,37 +1,60 @@
+"""Prompt-Factory für die Subpotenzial-Bewertung."""
+
+from __future__ import annotations
+
+
 def create_prompt(
     potential_name: str,
     subpotential_name: str,
     img_name: str,
     pdf_name: str,
+    llm_evaluation_goal: str,
+    llm_check_method: str,
     potential_high: str,
     potential_medium: str,
-    potential_low: str
+    potential_low: str,
 ) -> str:
+    """Baut den Systemtext für ein Subpotenzial.
+
+    Die Domain-spezifischen Slots ``llm_evaluation_goal`` und
+    ``llm_check_method`` stammen direkt aus der ``SheetMetalSubPotential``-
+    Definition (siehe ``smi.domain.sub_potentials``).
+    """
     return f"""
-    Du bist ein erfahrener Senior Manufacturing Engineer, Konstruktionsberater und Experte
-    im Bereich Blechproduktion. Dein Aufgabe ist es das Blechpotenzial einer Blechkonstruktion 
-    anhand einer fest definierten Bewertungslogik zu bewerten. \n
+Du bist ein erfahrener Senior Manufacturing Engineer, Konstruktionsberater
+und Experte im Bereich Blechproduktion. Deine Aufgabe ist es, das
+Blechpotenzial einer Blechkonstruktion anhand einer fest definierten
+Bewertungslogik zu bewerten.
 
-    Im Rahmen des Optimierungspotenzials „{potential_name}“ bewerte 
-    das Subpotenzial „{subpotential_name}“ nach der folgenden Bewertungslogik. \n
+Im Rahmen des Optimierungspotenzials „{potential_name}" bewerte das
+Subpotenzial „{subpotential_name}" nach der folgenden Bewertungslogik.
 
-    Eingaben: \n
-    - Foto des Metall- oder Blechteils: {img_name}
-    - PDF mit Informationen zum Optimierungspotenzial: {pdf_name}\n
+Eingaben:
+- Foto des Metall- oder Blechteils: {img_name}
+- PDF mit Informationen zum Optimierungspotenzial: {pdf_name}
 
-    Vorgehen: \n
-    1. Analysiere die PDF „{pdf_name}“. \n
-    2. Identifiziere relevante Informationen zu Bewertung von dem Subpotenzial „{subpotential_name}“\n
-    4. Analysiere das Foto der Blechkonstruktion „{img_name}“.\n
-    5. Leit Beobachtbare Hinweise aus dem Bild „{img_name}“ der Blechkonstruktion ab.\n
-    5. Bewerte das Subpotenzial „{subpotential_name}“ nach der  Bewertungslogik.\n
+Ziel der Bewertung:
+{llm_evaluation_goal}
 
-    Bewertungslogik:\n\n
-    Bedingung für hohes Potenzial:\n
-    {potential_high}\n
-    Bedingung für mittleres Potenzial:\n
-    {potential_medium}\n
-    Bedingung für geringes Potenzial:\n
-    {potential_low}\n
+Vorgehen zur Prüfung:
+{llm_check_method}
 
-    """.strip()
+Allgemeines Vorgehen:
+1. Analysiere die PDF „{pdf_name}".
+2. Identifiziere relevante Informationen zur Bewertung des Subpotenzials
+   „{subpotential_name}".
+3. Analysiere das Foto der Blechkonstruktion „{img_name}".
+4. Leite beobachtbare Hinweise aus dem Bild „{img_name}" ab.
+5. Bewerte das Subpotenzial „{subpotential_name}" nach der Bewertungslogik.
+
+Bewertungslogik:
+
+Bedingung für hohes Potenzial:
+{potential_high}
+
+Bedingung für mittleres Potenzial:
+{potential_medium}
+
+Bedingung für geringes Potenzial:
+{potential_low}
+""".strip()

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Blech-Bewertung – {{ sheet_metal_id }}</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --fg: #1a1a1a;
+      --fg-muted: #5a5a5a;
+      --bg: #fafafa;
+      --card: #ffffff;
+      --border: #e2e2e2;
+      --error-bg: #fdecea;
+      --error-fg: #8a1c13;
+      --error-border: #f3b7b1;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 2rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+      color: var(--fg);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+    h1 { margin: 0 0 .25rem 0; font-size: 1.6rem; }
+    h2 { margin: 1.75rem 0 .75rem 0; font-size: 1.25rem; }
+    h3 { margin: 0 0 .5rem 0; font-size: 1.05rem; }
+    .meta { color: var(--fg-muted); font-size: .9rem; margin-bottom: 1.5rem; }
+    .img-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .img-wrap img {
+      max-width: 100%;
+      max-height: 480px;
+      object-fit: contain;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: .55rem .75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: .95rem;
+    }
+    th { background: #f3f3f3; font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+    details {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      margin-bottom: 1rem;
+    }
+    details > summary {
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    details[open] > summary { margin-bottom: .75rem; }
+    .sub {
+      border-top: 1px dashed var(--border);
+      padding-top: .75rem;
+      margin-top: .75rem;
+    }
+    .sub:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+    .sub-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .sub-meta {
+      color: var(--fg-muted);
+      font-size: .85rem;
+    }
+    .kv { margin: .35rem 0; }
+    .kv-label { color: var(--fg-muted); font-size: .85rem; }
+    .evidence { margin: .25rem 0 .5rem 1.25rem; padding: 0; }
+    .evidence li { margin: .1rem 0; }
+    .error-box {
+      margin-top: .5rem;
+      padding: .5rem .75rem;
+      background: var(--error-bg);
+      color: var(--error-fg);
+      border: 1px solid var(--error-border);
+      border-radius: 6px;
+      font-size: .9rem;
+      white-space: pre-wrap;
+    }
+    .badge {
+      display: inline-block;
+      padding: .15rem .55rem;
+      border-radius: 999px;
+      color: #fff;
+      font-size: .8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+    .badge-high   { background: #d7263d; }
+    .badge-medium { background: #f4a62a; }
+    .badge-low    { background: #39916b; }
+    .badge-none   { background: #888888; }
+    .confidence-bar {
+      background: #eee;
+      border-radius: 4px;
+      height: 8px;
+      overflow: hidden;
+      margin-top: .15rem;
+      width: 180px;
+    }
+    .confidence-bar > span {
+      display: block;
+      height: 100%;
+      background: #4b89ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>Blech-Bewertung – {{ sheet_metal_id }}</h1>
+  <div class="meta">Erzeugt: {{ generated_at }}</div>
+
+  <div class="img-wrap">
+    <img src="{{ image_data_url }}" alt="Blechkonstruktion {{ sheet_metal_id }}">
+  </div>
+
+  <h2>Übersicht</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 8rem;">Potenzial-ID</th>
+        <th>Potenzial</th>
+        <th style="width: 7rem;">Rating</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in results %}
+      <tr>
+        <td><code>{{ p.potential_id }}</code></td>
+        <td>{{ p.potential_name }}</td>
+        <td><span class="badge badge-{{ p.rating.value }}">{{ p.rating.value }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>Details</h2>
+  {% for p in results %}
+  <details open>
+    <summary>
+      <code>{{ p.potential_id }}</code>
+      <span>{{ p.potential_name }}</span>
+      <span class="badge badge-{{ p.rating.value }}">{{ p.rating.value }}</span>
+    </summary>
+
+    {% for sp in p.subpotentials %}
+    <div class="sub">
+      <div class="sub-head">
+        <h3>
+          <code>{{ sp.subpotential_id }}</code> – {{ sp.subpotential_name }}
+        </h3>
+        <span class="badge badge-{{ sp.rating.value }}">{{ sp.rating.value }}</span>
+      </div>
+      <div class="sub-meta">
+        Checkpoint-Typ: {{ sp.checkpoint_typ.value }}
+      </div>
+
+      <div class="kv">
+        <div class="kv-label">Konfidenz</div>
+        <div>
+          {{ '%.0f'|format(sp.confidence * 100) }} %
+          <div class="confidence-bar">
+            <span style="width: {{ '%.0f'|format(sp.confidence * 100) }}%"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kv">
+        <div class="kv-label">Begründung</div>
+        <div>{{ sp.reason }}</div>
+      </div>
+
+      {% if sp.evidence %}
+      <div class="kv">
+        <div class="kv-label">Beobachtete Hinweise</div>
+        <ul class="evidence">
+          {% for e in sp.evidence %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      {% if sp.error %}
+      <div class="error-box"><strong>Fehler:</strong> {{ sp.error }}</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </details>
+  {% endfor %}
+</body>
+</html>
