@@ -87,10 +87,11 @@ class SheetMetalSubPotential:
     )
 
     # following are used in the system prompt
-    llm_model: LLMSheetMetalSubPotential = field(
+    llm_model: type[LLMSheetMetalSubPotential] = field(
+        default=LLMSheetMetalSubPotential,
         metadata={
             "description": "Pydantic-Modell mit LLM-Bewertungs- und LLM-Ergebnisfeldern",
-        }
+        },
     )
     llm_evaluation_goal: str = Field(
         metadata={

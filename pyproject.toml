@@ -104,7 +104,7 @@ where = ["src"]
 [tool.setuptools.package-data]
 # Zusätzliche Dateien, die mit ins Paket aufgenommen werden sollen
 # Beispiel für Typisierungsmarker bei typed packages
-smi = ["py.typed"]
+smi = ["py.typed", "templates/*.j2", "templates/*.html.j2"]
 
 
 [tool.pytest.ini_options]
