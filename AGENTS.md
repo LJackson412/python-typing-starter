@@ -4,17 +4,17 @@
 - Do not change unrelated code.
 
 ## Python
-- Code must pass `mypy --strict`.
-- Use `ruff` for linting.
-- Use `black` for formatting.
 - Add type annotations to new public code.
 - Use Google-style docstrings for public classes and functions.
 
-## Verification
-Before finishing, run:
+### Statische Analyse und Formatierung -  Ablauf vor einem Commit
 
 ```bash
-ruff check .
-black --check .
-mypy --strict .
+black src/ tests/ && ruff check src/ tests/ --fix && mypy src/ tests/
+```
+
+```cmd
+python -m black src/ tests/
+python -m ruff check src/ tests/ --fix
+python -m mypy src/
 ```

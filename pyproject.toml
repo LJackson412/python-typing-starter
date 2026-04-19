@@ -23,13 +23,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 # Paketname auf PyPI bzw. interner Paketname
-name = "<project_name>"
+name = "smi"
 
 # Fallback-Version; kann bei Bedarf durch setuptools-scm aus Git-Tags kommen
 version = "0.1.0"
 
 # Kurzbeschreibung des Projekts
-description = "<short_project_description>"
+description = ""
 
 # Unterstützte Python-Version
 requires-python = ">=3.12"
@@ -39,7 +39,7 @@ readme = "README.md"
 
 # Autorenliste
 authors = [
-  { name = "<author_name_or_email>" }
+  { name = "samuel.goetz" }
 ]
 
 # Schlagworte zur Kategorisierung
@@ -51,7 +51,12 @@ keywords = [
 
 # Laufzeit-Abhängigkeiten des Projekts
 dependencies = [
+  # LangChain / LangGraph - v1-Linie
+  "langchain>=1.2.13,<2.0",
+  "langgraph>=1.1.3,<2.0",
 
+  # Model-Integration 
+  "langchain-openai>=1.1.12,<2.0",
 ]
 
 
@@ -92,7 +97,7 @@ where = ["src"]
 [tool.setuptools.package-data]
 # Zusätzliche Dateien, die mit ins Paket aufgenommen werden sollen
 # Beispiel für Typisierungsmarker bei typed packages
-<package_import_name> = ["py.typed"]
+smi = ["py.typed"]
 
 
 [tool.pytest.ini_options]
