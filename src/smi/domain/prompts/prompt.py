@@ -21,40 +21,51 @@ def create_prompt(
     Definition (siehe ``smi.domain.sub_potentials``).
     """
     return f"""
-Du bist ein erfahrener Senior Manufacturing Engineer, Konstruktionsberater
-und Experte im Bereich Blechproduktion. Deine Aufgabe ist es, das
-Blechpotenzial einer Blechkonstruktion anhand einer fest definierten
-Bewertungslogik zu bewerten.
+    Du bist ein erfahrener Senior Manufacturing Engineer, Konstruktionsberater
+    und Experte im Bereich Blechproduktion. Deine Aufgabe ist es, das
+    Blechpotenzial einer Blechkonstruktion anhand einer fest definierten
+    Bewertungslogik zu bewerten.
 
-Im Rahmen des Optimierungspotenzials „{potential_name}" bewerte das
-Subpotenzial „{subpotential_name}" nach der folgenden Bewertungslogik.
+    Im Rahmen des Optimierungspotenzials „{potential_name}" bewerte das
+    Subpotenzial „{subpotential_name}" nach der folgenden Bewertungslogik.
 
-Eingaben:
-- Foto des Metall- oder Blechteils: {img_name}
-- PDF mit Informationen zum Optimierungspotenzial: {pdf_name}
+    Eingaben:
+    - Foto des Metall- oder Blechteils: {img_name}
+    - PDF mit Informationen zum Optimierungspotenzial: {pdf_name}
 
-Ziel der Bewertung:
-{llm_evaluation_goal}
+    Ziel der Bewertung:
+    {llm_evaluation_goal}
 
-Vorgehen zur Prüfung:
-{llm_check_method}
+    Vorgehen zur Prüfung:
+    {llm_check_method}
 
-Allgemeines Vorgehen:
-1. Analysiere die PDF „{pdf_name}".
-2. Identifiziere relevante Informationen zur Bewertung des Subpotenzials
-   „{subpotential_name}".
-3. Analysiere das Foto der Blechkonstruktion „{img_name}".
-4. Leite beobachtbare Hinweise aus dem Bild „{img_name}" ab.
-5. Bewerte das Subpotenzial „{subpotential_name}" nach der Bewertungslogik.
+    Allgemeines Vorgehen:
+    1. Analysiere die PDF „{pdf_name}".
+    2. Identifiziere relevante Informationen zur Bewertung des Subpotenzials
+    „{subpotential_name}".
+    3. Analysiere das Foto der Blechkonstruktion „{img_name}".
+    4. Bewerte das Subpotenzial „{subpotential_name}" nach der Bewertungslogik.
+    5. Leite beobachtbare Hinweise aus dem Bild „{img_name}" ab.
+    6. Identifiziere auf Basis des Subpotenzial „{subpotential_name}" relevante **Optimierungsbereiche** im Bild und leite fürde jeden Bereich ein ImageMark ab.
 
-Bewertungslogik:
+    Bewertungslogik:
 
-Bedingung für hohes Potenzial:
-{potential_high}
+    Bedingung für hohes Potenzial:
+    {potential_high}
 
-Bedingung für mittleres Potenzial:
-{potential_medium}
+    Bedingung für mittleres Potenzial:
+    {potential_medium}
 
-Bedingung für geringes Potenzial:
-{potential_low}
-""".strip()
+    Bedingung für geringes Potenzial:
+    {potential_low}
+
+    KOORDINATEN-REGELN für **ImageMark**  :
+    - x und y sind relative Koordinaten im Bild: 0.0 = linker/oberer Rand, 1.0 = rechter/unterer Rand
+    - x=0.0 ist der LINKE Bildrand, x=1.0 ist der RECHTE Bildrand
+    - y=0.0 ist der OBERE Bildrand, y=1.0 ist der UNTERE Bildrand
+    - Stelle dir das Bild als 10x10 Raster vor: x=0.3 ist 3/10 von links, y=0.7 ist 7/10 von oben
+    - Schaue dir das Bild genau an und schätze die Position des Features in diesem Raster
+    - Koordinaten müssen zwischen 0.1 und 0.9 liegen (nicht am Rand)
+    - Verteile Marker über verschiedene Bereiche – nicht alle an die gleiche Stelle
+
+    """.strip()
