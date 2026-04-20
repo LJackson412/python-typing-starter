@@ -12,7 +12,10 @@ from smi.domain.schema.result import PotentialResult
 
 logger = logging.getLogger("smi.services.report")
 
-_DEFAULT_OUTPUT_DIR = Path("output/reports")
+
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+
+_DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "output" / "sheet_metal"
 _TIMESTAMP_FORMAT = "%Y%m%d_%H%M%S"
 
 _env = Environment(

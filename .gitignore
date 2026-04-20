@@ -21,6 +21,7 @@ build/
 
 # Prod Data
 /data/kb
+.claude/
 
 
 

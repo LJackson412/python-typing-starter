@@ -5,7 +5,9 @@ from __future__ import annotations
 import base64
 from pathlib import Path
 
-IMG_BASE_DIR = Path("data/sheet_metal")
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+
+IMG_BASE_DIR = PROJECT_ROOT / "data" / "sheet_metal"
 IMG_SUFFIX = ".png"
 IMG_MIME_TYPE = "image/png"
 

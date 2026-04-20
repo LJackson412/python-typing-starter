@@ -5,7 +5,9 @@ from __future__ import annotations
 import base64
 from pathlib import Path
 
-PDF_BASE_DIR = Path("data/optimisation_potential")
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+
+PDF_BASE_DIR = PROJECT_ROOT / "data" / "optimisation_potential"
 PDF_SUFFIX = ".pdf"
 
 
