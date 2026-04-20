@@ -58,14 +58,4 @@ def create_prompt(
 
     Bedingung für geringes Potenzial:
     {potential_low}
-
-    KOORDINATEN-REGELN für **ImageMark**  :
-    - x und y sind relative Koordinaten im Bild: 0.0 = linker/oberer Rand, 1.0 = rechter/unterer Rand
-    - x=0.0 ist der LINKE Bildrand, x=1.0 ist der RECHTE Bildrand
-    - y=0.0 ist der OBERE Bildrand, y=1.0 ist der UNTERE Bildrand
-    - Stelle dir das Bild als 10x10 Raster vor: x=0.3 ist 3/10 von links, y=0.7 ist 7/10 von oben
-    - Schaue dir das Bild genau an und schätze die Position des Features in diesem Raster
-    - Koordinaten müssen zwischen 0.1 und 0.9 liegen (nicht am Rand)
-    - Verteile Marker über verschiedene Bereiche – nicht alle an die gleiche Stelle
-
     """.strip()
