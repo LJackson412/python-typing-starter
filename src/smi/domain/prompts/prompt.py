@@ -46,7 +46,7 @@ def create_prompt(
     3. Analysiere das Foto der Blechkonstruktion „{img_name}".
     4. Bewerte das Subpotenzial „{subpotential_name}" nach der Bewertungslogik.
     5. Leite beobachtbare Hinweise aus dem Bild „{img_name}" ab.
-    6. Identifiziere auf Basis des Subpotenzial „{subpotential_name}" relevante **Optimierungsbereiche** im Bild und leite fürde jeden Bereich ein ImageMark ab.
+    6. Identifiziere auf Basis des Subpotenzial „{subpotential_name}" relevante **Optimierungsbereiche** im Bild und leite für jeden Bereich ein ImageMark ab.
 
     Bewertungslogik:
 
@@ -58,14 +58,4 @@ def create_prompt(
 
     Bedingung für geringes Potenzial:
     {potential_low}
-
-    KOORDINATEN-REGELN für **ImageMark**  :
-    - x und y sind relative Koordinaten im Bild: 0.0 = linker/oberer Rand, 1.0 = rechter/unterer Rand
-    - x=0.0 ist der LINKE Bildrand, x=1.0 ist der RECHTE Bildrand
-    - y=0.0 ist der OBERE Bildrand, y=1.0 ist der UNTERE Bildrand
-    - Stelle dir das Bild als 10x10 Raster vor: x=0.3 ist 3/10 von links, y=0.7 ist 7/10 von oben
-    - Schaue dir das Bild genau an und schätze die Position des Features in diesem Raster
-    - Koordinaten müssen zwischen 0.1 und 0.9 liegen (nicht am Rand)
-    - Verteile Marker über verschiedene Bereiche – nicht alle an die gleiche Stelle
-
     """.strip()

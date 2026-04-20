@@ -11,6 +11,8 @@
       --bg: #fafafa;
       --card: #ffffff;
       --border: #e2e2e2;
+      --accent: #4b89ff;
+      --accent-soft: #eef4ff;
       --error-bg: #fdecea;
       --error-fg: #8a1c13;
       --error-border: #f3b7b1;
@@ -29,19 +31,102 @@
     h2 { margin: 1.75rem 0 .75rem 0; font-size: 1.25rem; }
     h3 { margin: 0 0 .5rem 0; font-size: 1.05rem; }
     .meta { color: var(--fg-muted); font-size: .9rem; margin-bottom: 1.5rem; }
-    .img-wrap {
+
+    .viewer {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 1rem;
       margin-bottom: 1.5rem;
+    }
+    .img-stage {
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+      line-height: 0;
+    }
+    .img-stage-wrap {
       text-align: center;
     }
-    .img-wrap img {
+    .img-stage img {
       max-width: 100%;
       max-height: 480px;
       object-fit: contain;
+      display: block;
     }
+    .marks-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .mark {
+      position: absolute;
+      border: 2px solid var(--accent);
+      border-radius: 4px;
+      box-shadow: 0 0 0 1px rgba(75, 137, 255, .15);
+    }
+    .mark-label {
+      position: absolute;
+      top: -1.4rem;
+      left: -2px;
+      background: var(--accent);
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 600;
+      padding: .1rem .45rem;
+      border-radius: 3px;
+      white-space: nowrap;
+      line-height: 1.2;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .marks-empty {
+      position: absolute;
+      left: 50%;
+      bottom: .75rem;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, .9);
+      color: var(--fg-muted);
+      font-size: .8rem;
+      padding: .25rem .6rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-top: 1rem;
+    }
+    .tab {
+      padding: .5rem .9rem;
+      font-size: .85rem;
+      color: var(--fg-muted);
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: color .15s, border-color .15s, background .15s;
+      font-family: inherit;
+      margin-bottom: -1px;
+    }
+    .tab:hover {
+      color: var(--fg);
+      border-bottom-color: var(--border);
+    }
+    .tab.active {
+      color: var(--fg);
+      border-bottom-color: var(--accent);
+      font-weight: 600;
+    }
+    .tab code {
+      font-size: .78rem;
+      color: inherit;
+      background: transparent;
+      margin-right: .35rem;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -58,6 +143,20 @@
     }
     th { background: #f3f3f3; font-weight: 600; }
     tr:last-child td { border-bottom: none; }
+    tr.potential-row {
+      cursor: pointer;
+      transition: background .15s;
+    }
+    tr.potential-row:hover { background: #f7f9fc; }
+    tr.potential-row.active {
+      background: var(--accent-soft);
+      box-shadow: inset 3px 0 0 var(--accent);
+    }
+    tr.potential-row:focus {
+      outline: none;
+      background: var(--accent-soft);
+    }
+
     details {
       background: var(--card);
       border: 1px solid var(--border);
@@ -130,7 +229,7 @@
     .confidence-bar > span {
       display: block;
       height: 100%;
-      background: #4b89ff;
+      background: var(--accent);
     }
   </style>
 </head>
@@ -138,8 +237,14 @@
   <h1>Blech-Bewertung – {{ sheet_metal_id }}</h1>
   <div class="meta">Erzeugt: {{ generated_at }}</div>
 
-  <div class="img-wrap">
-    <img src="{{ image_data_url }}" alt="Blechkonstruktion {{ sheet_metal_id }}">
+  <div class="viewer">
+    <div class="img-stage-wrap">
+      <div class="img-stage" id="img-stage">
+        <img src="{{ image_data_url }}" alt="Blechkonstruktion {{ sheet_metal_id }}">
+        <div class="marks-layer" id="marks-layer"></div>
+      </div>
+    </div>
+    <div class="tabs" id="tabs" role="tablist"></div>
   </div>
 
   <h2>Übersicht</h2>
@@ -151,9 +256,12 @@
         <th style="width: 7rem;">Rating</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="overview-body">
       {% for p in results %}
-      <tr>
+      <tr class="potential-row{% if loop.first %} active{% endif %}"
+          data-potential-id="{{ p.potential_id }}"
+          role="button"
+          tabindex="0">
         <td><code>{{ p.potential_id }}</code></td>
         <td>{{ p.potential_name }}</td>
         <td><span class="badge badge-{{ p.rating.value }}">{{ p.rating.value }}</span></td>
@@ -214,5 +322,173 @@
     {% endfor %}
   </details>
   {% endfor %}
+
+  <script id="smi-data" type="application/json">
+  [
+    {% for p in results %}
+    {
+      "potential_id": {{ p.potential_id | tojson }},
+      "potential_name": {{ p.potential_name | tojson }},
+      "subpotentials": [
+        {% for sp in p.subpotentials %}
+        {
+          "id": {{ sp.subpotential_id | tojson }},
+          "name": {{ sp.subpotential_name | tojson }},
+          "marks": [
+            {% for m in sp.image_marks %}
+            {
+              "label": {{ m.optimization_area | tojson }},
+              "xMin": {{ m.xMin }},
+              "yMin": {{ m.yMin }},
+              "xMax": {{ m.xMax }},
+              "yMax": {{ m.yMax }}
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+          ]
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ]
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+  </script>
+
+  <script>
+    (function () {
+      var dataNode = document.getElementById("smi-data");
+      var potentials = [];
+      try {
+        potentials = JSON.parse(dataNode.textContent);
+      } catch (err) {
+        console.error("SMI: failed to parse report data", err);
+        return;
+      }
+
+      var tabsEl = document.getElementById("tabs");
+      var marksLayer = document.getElementById("marks-layer");
+      var overviewBody = document.getElementById("overview-body");
+
+      var state = {
+        potentialId: null,
+        subId: null
+      };
+
+      function findPotential(pid) {
+        for (var i = 0; i < potentials.length; i++) {
+          if (potentials[i].potential_id === pid) return potentials[i];
+        }
+        return null;
+      }
+
+      function findSub(pot, subId) {
+        if (!pot) return null;
+        for (var i = 0; i < pot.subpotentials.length; i++) {
+          if (pot.subpotentials[i].id === subId) return pot.subpotentials[i];
+        }
+        return null;
+      }
+
+      function renderMarks(sub) {
+        marksLayer.innerHTML = "";
+        if (!sub) return;
+        if (!sub.marks || sub.marks.length === 0) {
+          var empty = document.createElement("div");
+          empty.className = "marks-empty";
+          empty.textContent = "Keine Optimierungsbereiche markiert";
+          marksLayer.appendChild(empty);
+          return;
+        }
+        sub.marks.forEach(function (m) {
+          var box = document.createElement("div");
+          box.className = "mark";
+          var left = Math.max(0, Math.min(1, m.xMin)) * 100;
+          var top = Math.max(0, Math.min(1, m.yMin)) * 100;
+          var width = Math.max(0, Math.min(1, m.xMax - m.xMin)) * 100;
+          var height = Math.max(0, Math.min(1, m.yMax - m.yMin)) * 100;
+          box.style.left = left + "%";
+          box.style.top = top + "%";
+          box.style.width = width + "%";
+          box.style.height = height + "%";
+
+          var label = document.createElement("div");
+          label.className = "mark-label";
+          label.textContent = m.label;
+          box.appendChild(label);
+
+          marksLayer.appendChild(box);
+        });
+      }
+
+      function renderTabs(pot) {
+        tabsEl.innerHTML = "";
+        if (!pot) return;
+        pot.subpotentials.forEach(function (sp, idx) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "tab" + (idx === 0 ? " active" : "");
+          btn.setAttribute("role", "tab");
+          btn.setAttribute("data-sub-id", sp.id);
+          btn.innerHTML = '<code>' + escapeHtml(sp.id) + '</code>' + escapeHtml(sp.name);
+          btn.addEventListener("click", function () {
+            selectTab(pot.potential_id, sp.id);
+          });
+          tabsEl.appendChild(btn);
+        });
+      }
+
+      function escapeHtml(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function selectTab(pid, subId) {
+        state.potentialId = pid;
+        state.subId = subId;
+        var buttons = tabsEl.querySelectorAll(".tab");
+        buttons.forEach(function (b) {
+          b.classList.toggle("active", b.getAttribute("data-sub-id") === subId);
+        });
+        var pot = findPotential(pid);
+        renderMarks(findSub(pot, subId));
+      }
+
+      function selectPotential(pid) {
+        var pot = findPotential(pid);
+        if (!pot) return;
+        state.potentialId = pid;
+        overviewBody.querySelectorAll("tr.potential-row").forEach(function (tr) {
+          tr.classList.toggle("active", tr.getAttribute("data-potential-id") === pid);
+        });
+        renderTabs(pot);
+        var firstSub = pot.subpotentials[0];
+        if (firstSub) {
+          selectTab(pid, firstSub.id);
+        } else {
+          state.subId = null;
+          renderMarks(null);
+        }
+      }
+
+      overviewBody.querySelectorAll("tr.potential-row").forEach(function (tr) {
+        tr.addEventListener("click", function () {
+          selectPotential(tr.getAttribute("data-potential-id"));
+        });
+        tr.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            selectPotential(tr.getAttribute("data-potential-id"));
+          }
+        });
+      });
+
+      if (potentials.length > 0) {
+        selectPotential(potentials[0].potential_id);
+      }
+    })();
+  </script>
 </body>
 </html>

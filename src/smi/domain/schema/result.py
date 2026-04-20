@@ -12,6 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from smi.domain.schema.potential import PotentialRating
 from smi.domain.schema.sub_potential import (
     CheckpointTyp,
+    ImageMark,
     LLMSheetMetalSubPotential,
     Rating,
     SheetMetalSubPotential,
@@ -30,6 +31,7 @@ class SubPotentialResult(BaseModel):
     reason: str
     evidence: list[str]
     confidence: float = Field(ge=0.0, le=1.0)
+    image_marks: list[ImageMark] = Field(default_factory=list)
     error: str | None = Field(
         default=None,
         description="Gesetzt, wenn der LLM-Call eine Exception geworfen hat.",
@@ -51,6 +53,7 @@ class SubPotentialResult(BaseModel):
             reason=llm.reason,
             evidence=list(llm.evidence),
             confidence=llm.confidence,
+            image_marks=list(llm.image_marks),
             error=None,
         )
 
@@ -75,6 +78,7 @@ class SubPotentialResult(BaseModel):
             reason="LLM-Aufruf fehlgeschlagen.",
             evidence=[],
             confidence=0.0,
+            image_marks=[],
             error=f"{type(exc).__name__}: {exc}",
         )
 
