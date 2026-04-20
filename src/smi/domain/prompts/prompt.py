@@ -46,7 +46,7 @@ def create_prompt(
     3. Analysiere das Foto der Blechkonstruktion „{img_name}".
     4. Bewerte das Subpotenzial „{subpotential_name}" nach der Bewertungslogik.
     5. Leite beobachtbare Hinweise aus dem Bild „{img_name}" ab.
-    6. Identifiziere auf Basis des Subpotenzial „{subpotential_name}" relevante **Optimierungsbereiche** im Bild und leite fürde jeden Bereich ein ImageMark ab.
+    6. Identifiziere auf Basis des Subpotenzial „{subpotential_name}" relevante **Optimierungsbereiche** im Bild und leite für jeden Bereich ein ImageMark ab.
 
     Bewertungslogik:
 
